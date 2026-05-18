@@ -1,0 +1,107 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.pyo
+*.pyd
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code related
+.vscode/
+*.code-workspace
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Python related
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.eggs/
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+Thumbs.db
+ehthumbs.db
+
+# Build outputs
+dist/
+build/
+*.so
+*.dll
+*.dylib
+
+# Admin panel specific
+admin_panel/.dart_tool/
+admin_panel/.pub-cache/
+admin_panel/build/
+admin_panel/ios/Flutter/.last_build_id
+admin_panel/android/app/debug
+admin_panel/android/app/profile
+admin_panel/android/app/release
+
+# Frontend specific
+frontend/.dart_tool/
+frontend/.pub-cache/
+frontend/build/
+frontend/ios/Flutter/.last_build_id
+frontend/android/app/debug
+frontend/android/app/profile
+frontend/android/app/release
