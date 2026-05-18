@@ -1,4 +1,4 @@
-# 海龟汤游戏 (Turtle Soup Game)
+# 请喝汤 (Sip of Soup)
 
 一款基于智谱AI的海龟汤推理游戏，包含前端游戏界面、后端API服务和管理员面板。
 
