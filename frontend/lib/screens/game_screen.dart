@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:turtle_soup/providers/game_provider.dart';
 import 'package:provider/provider.dart';
+import '../providers/game_provider.dart';
 import '../widgets/background_widget.dart';
+import '../theme/theme.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -33,18 +34,14 @@ class _GameScreenState extends State<GameScreen> {
       _isLoading = true;
     });
 
-    // 立即显示问题和加载状态
     gameProvider.startQuestion(question);
     _textController.clear();
 
     try {
-      // Call backend API for AI response
       final answer = await gameProvider.askQuestion(question);
 
-      // Update answer (replaces the loading indicator)
       gameProvider.finishQuestion(answer);
 
-      // Check if game is won
       if (answer == '正确' || gameProvider.gameOver) {
         Future.delayed(const Duration(seconds: 1), () {
           context.push('/gameover');
@@ -52,7 +49,6 @@ class _GameScreenState extends State<GameScreen> {
       }
     } catch (e) {
       print('Error sending question: $e');
-      // 如果出错，更新答案显示错误信息
       gameProvider.finishQuestion('无法获取回答');
     } finally {
       setState(() {
@@ -60,7 +56,6 @@ class _GameScreenState extends State<GameScreen> {
       });
     }
 
-    // Scroll to bottom
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
@@ -78,16 +73,22 @@ class _GameScreenState extends State<GameScreen> {
 
   Future<void> _showHint() async {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
-    
+
     if (gameProvider.hintCount >= gameProvider.maxHints) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('提示次数已用完'),
-          content: const Text('每局游戏最多可查看3次提示'),
+          title: const Text('提示次数已用完', style: TextStyle(color: AppTheme.cream)),
+          content: const Text('每局游戏最多可查看3次提示',
+              style: TextStyle(color: AppTheme.cream)),
+          backgroundColor: AppTheme.cardBackground,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
+              style: TextButton.styleFrom(foregroundColor: AppTheme.gold),
               child: const Text('关闭'),
             ),
           ],
@@ -101,17 +102,22 @@ class _GameScreenState extends State<GameScreen> {
     });
 
     try {
-      // Call backend API for hint
       final hint = await gameProvider.getHint();
 
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('提示 (${gameProvider.hintCount}/${gameProvider.maxHints})'),
-          content: Text(hint),
+          title: Text('提示 (${gameProvider.hintCount}/${gameProvider.maxHints})',
+              style: TextStyle(color: AppTheme.cream)),
+          content: Text(hint, style: TextStyle(color: AppTheme.cream)),
+          backgroundColor: AppTheme.cardBackground,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
+              style: TextButton.styleFrom(foregroundColor: AppTheme.gold),
               child: const Text('关闭'),
             ),
           ],
@@ -134,67 +140,86 @@ class _GameScreenState extends State<GameScreen> {
     if (story == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('游戏'),
+          title: const Text('游戏', style: AppTheme.navTitleStyle),
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
         extendBodyBehindAppBar: true,
         body: BackgroundWidget(
-          child: const Center(child: Text('请先选择故事', style: TextStyle(color: Colors.white))),
+          child: const Center(
+              child: Text('请先选择故事', style: TextStyle(color: AppTheme.cream))),
         ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(story.title, style: const TextStyle(color: Colors.white)),
+        title: Text(story.title, style: AppTheme.navTitleStyle),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        toolbarHeight: 78,
+        iconTheme: const IconThemeData(color: AppTheme.goldLight, size: 34),
       ),
       extendBodyBehindAppBar: true,
       body: BackgroundWidget(
         child: Column(
           children: [
-            const SizedBox(height: 60),
-            // Surface Story
+            const SizedBox(height: 96),
+            const _TitleRule(),
+            const SizedBox(height: 22),
             Container(
-              padding: const EdgeInsets.all(20),
-              margin: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Text(
-                story.surface,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                textAlign: TextAlign.center,
-              ),
-            ),
-
-            // Question Counter
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              padding: EdgeInsets.zero,
+              margin: const EdgeInsets.symmetric(horizontal: 22),
+              decoration: AppTheme.cardDecoration,
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    '剩余提问次数: ${gameProvider.maxQuestions - gameProvider.questionCount}',
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 22),
+                    child: Text(
+                      story.surface,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.cream,
+                        height: 1.85,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
                   ),
-                  Text(
-                    '难度: ${story.difficulty}',
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                  Container(
+                      height: 1, color: AppTheme.cardBorder.withOpacity(0.6)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '剩余提问次数: ${gameProvider.maxQuestions - gameProvider.questionCount}',
+                          style: const TextStyle(
+                              fontSize: 17, color: AppTheme.creamDark),
+                        ),
+                        Text(
+                          '难度: ${story.difficulty}',
+                          style: TextStyle(
+                            fontSize: 17,
+                            color:
+                                AppTheme.getDifficultyColor(story.difficulty),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-
-            // Chat Area
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.fromLTRB(22, 14, 22, 4),
                 child: ListView.builder(
                   controller: _scrollController,
                   itemCount: gameProvider.questions.length,
@@ -205,28 +230,63 @@ class _GameScreenState extends State<GameScreen> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: Container(
-                            padding: const EdgeInsets.all(10),
-                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            padding: const EdgeInsets.all(16),
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            constraints: const BoxConstraints(maxWidth: 280),
                             decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(10),
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Color(0xFF1e3a5f),
+                                  Color(0xFF0d1b2a),
+                                ],
+                              ),
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(22),
+                                topRight: Radius.circular(22),
+                                bottomLeft: Radius.circular(22),
+                                bottomRight: Radius.circular(6),
+                              ),
+                              border: Border.all(
+                                  color: AppTheme.blueChip, width: 1),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x660066CC),
+                                  blurRadius: 16,
+                                  offset: Offset(0, 6),
+                                ),
+                              ],
                             ),
                             child: Text(
                               gameProvider.questions[index],
-                              style: const TextStyle(color: Colors.white),
+                              style: const TextStyle(
+                                  color: AppTheme.cream, fontSize: 15),
                             ),
                           ),
                         ),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Container(
-                            padding: const EdgeInsets.all(10),
-                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            padding: const EdgeInsets.all(16),
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            constraints: const BoxConstraints(maxWidth: 280),
                             decoration: BoxDecoration(
-                              color: Colors.grey.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(10),
+                              color: AppTheme.cardBackground,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(22),
+                                topRight: Radius.circular(22),
+                                bottomLeft: Radius.circular(6),
+                                bottomRight: Radius.circular(22),
+                              ),
+                              border: Border.all(color: AppTheme.cardBorder),
+                              boxShadow: const [AppTheme.cardShadow],
                             ),
-                            child: Text(gameProvider.answers[index], style: const TextStyle(color: Colors.white)),
+                            child: Text(
+                              gameProvider.answers[index],
+                              style: const TextStyle(
+                                  color: AppTheme.cream, fontSize: 15),
+                            ),
                           ),
                         ),
                       ],
@@ -235,65 +295,92 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             ),
-
-            // Input Area
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(22, 8, 22, 12),
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: _textController,
-                      decoration: InputDecoration(
-                        hintText: '输入你的问题...',
-                        hintStyle: const TextStyle(color: Colors.grey),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        fillColor: Colors.white.withOpacity(0.1),
-                        filled: true,
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: const BorderSide(color: Colors.white),
-                        ),
-                      ),
-                      style: const TextStyle(color: Colors.white),
+                      decoration: AppTheme.textFieldDecoration('输入你的问题...'),
+                      style: AppTheme.bodyStyle,
                       onSubmitted: (_) => _sendQuestion(),
                     ),
                   ),
-                  IconButton(
-                    onPressed: _sendQuestion,
-                    icon: const Icon(Icons.send, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [AppTheme.goldLight, AppTheme.gold],
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(AppTheme.borderRadiusButton),
+                      boxShadow: [
+                        AppTheme.glowShadow,
+                      ],
+                    ),
+                    child: IconButton(
+                      onPressed: _sendQuestion,
+                      icon: const Icon(Icons.send_rounded,
+                          color: AppTheme.ink, size: 32),
+                      padding: const EdgeInsets.all(15),
+                    ),
                   ),
                 ],
               ),
             ),
-
-            // Action Buttons
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: _giveUp,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _giveUp,
+                      style: AppTheme.dangerButtonStyle,
+                      child: const Text('放弃'),
+                    ),
                   ),
-                  child: const Text('放弃'),
-                ),
-                ElevatedButton(
-                  onPressed: _showHint,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _showHint,
+                      style: AppTheme.hintButtonStyle,
+                      child: Text(
+                          '查看提示 (${gameProvider.hintCount}/${gameProvider.maxHints})'),
+                    ),
                   ),
-                  child: Text('查看提示 (${gameProvider.hintCount}/${gameProvider.maxHints})'),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _TitleRule extends StatelessWidget {
+  const _TitleRule();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 176,
+      child: Row(
+        children: [
+          Expanded(
+              child:
+                  Container(height: 1, color: AppTheme.gold.withOpacity(0.52))),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Text('◇◇',
+                style: TextStyle(color: AppTheme.goldLight, fontSize: 14)),
+          ),
+          Expanded(
+              child:
+                  Container(height: 1, color: AppTheme.gold.withOpacity(0.52))),
+        ],
       ),
     );
   }
