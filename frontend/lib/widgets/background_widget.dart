@@ -12,17 +12,20 @@ class BackgroundWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/background.jpg'),
-          fit: BoxFit.cover,
-        ),
-      ),
+    return SizedBox.expand(
       child: Stack(
+        fit: StackFit.expand,
         children: [
-          Container(
-            color: Colors.black.withOpacity(0.48),
+          Image.asset(
+            'assets/images/background.jpg',
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+            errorBuilder: (context, error, stackTrace) {
+              return const ColoredBox(color: Color(0xFF120C08));
+            },
+          ),
+          ColoredBox(
+            color: Colors.black.withOpacity(0.22),
           ),
           Container(
             decoration: BoxDecoration(
@@ -30,9 +33,9 @@ class BackgroundWidget extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withOpacity(0.72),
-                  Colors.black.withOpacity(0.08),
-                  Colors.black.withOpacity(0.76),
+                  Colors.black.withOpacity(0.5),
+                  Colors.black.withOpacity(0.04),
+                  Colors.black.withOpacity(0.56),
                 ],
                 stops: const [0, 0.48, 1],
               ),
@@ -44,9 +47,9 @@ class BackgroundWidget extends StatelessWidget {
                 center: const Alignment(0.35, -0.72),
                 radius: 1.15,
                 colors: [
-                  const Color(0xFFFFB34B).withOpacity(0.24),
+                  const Color(0xFFFFB34B).withOpacity(0.18),
                   Colors.transparent,
-                  Colors.black.withOpacity(0.68),
+                  Colors.black.withOpacity(0.34),
                 ],
                 stops: const [0, 0.36, 1],
               ),
@@ -58,7 +61,7 @@ class BackgroundWidget extends StatelessWidget {
                 radius: 0.92,
                 colors: [
                   Colors.transparent,
-                  Colors.black.withOpacity(0.82),
+                  Colors.black.withOpacity(0.55),
                 ],
                 stops: const [0.52, 1],
               ),
@@ -79,9 +82,9 @@ class BackgroundWidget extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.black.withOpacity(0.52),
+                  Colors.black.withOpacity(0.36),
                   Colors.transparent,
-                  Colors.black.withOpacity(0.54),
+                  Colors.black.withOpacity(0.38),
                 ],
                 stops: const [0.0, 0.46, 1.0],
               ),
@@ -90,12 +93,12 @@ class BackgroundWidget extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               border: Border.all(
-                color: const Color(0xFF0A0604).withOpacity(0.5),
+                color: const Color(0xFF0A0604).withOpacity(0.35),
                 width: 8,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.85),
+                  color: Colors.black.withOpacity(0.58),
                   blurRadius: 80,
                   spreadRadius: 22,
                 ),
@@ -121,7 +124,7 @@ class BackgroundWidget extends StatelessWidget {
                 ),
               ),
             ),
-          child,
+          Positioned.fill(child: child),
         ],
       ),
     );
