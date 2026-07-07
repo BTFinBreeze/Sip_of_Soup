@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 import json
 from app.models.story import Story
 from app.config.database import get_db
-import uuid
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -40,14 +39,22 @@ def get_all_stories():
         stories = db.query(Story).all()
         result = []
         for story in stories:
+            try:
+                tags = json.loads(story.tags) if story.tags else []
+            except:
+                tags = []
+            try:
+                keywords = json.loads(story.keywords) if story.keywords else []
+            except:
+                keywords = []
             result.append({
                 'id': story.id,
                 'title': story.title,
                 'surface': story.surface,
                 'truth': story.truth,
-                'tags': json.loads(story.tags),
+                'tags': tags,
                 'difficulty': story.difficulty,
-                'keywords': json.loads(story.keywords)
+                'keywords': keywords
             })
         return jsonify(result), 200
     finally:
@@ -79,6 +86,8 @@ def create_story():
         }), 201
     except Exception as e:
         db.rollback()
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
     finally:
         db.close()
@@ -97,9 +106,9 @@ def update_story(story_id):
         story.title = data.get('title', story.title)
         story.surface = data.get('surface', story.surface)
         story.truth = data.get('truth', story.truth)
-        story.tags = json.dumps(data.get('tags', json.loads(story.tags)), ensure_ascii=False)
+        story.tags = json.dumps(data.get('tags', []), ensure_ascii=False)
         story.difficulty = data.get('difficulty', story.difficulty)
-        story.keywords = json.dumps(data.get('keywords', json.loads(story.keywords)), ensure_ascii=False)
+        story.keywords = json.dumps(data.get('keywords', []), ensure_ascii=False)
         
         db.commit()
         db.refresh(story)
@@ -107,6 +116,8 @@ def update_story(story_id):
         return jsonify({'message': '更新成功'}), 200
     except Exception as e:
         db.rollback()
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
     finally:
         db.close()
@@ -126,6 +137,8 @@ def delete_story(story_id):
         return jsonify({'message': '删除成功'}), 200
     except Exception as e:
         db.rollback()
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
     finally:
         db.close()

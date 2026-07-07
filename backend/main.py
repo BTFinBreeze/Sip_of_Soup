@@ -2,6 +2,9 @@ from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from app.config.database import engine, Base
+from app.models.story import Story
+from app.models.game_record import GameRecord
+from app.models.user import User
 from app.routes.stories import stories_bp
 from app.routes.game import game_bp
 from app.routes.admin import admin_bp
